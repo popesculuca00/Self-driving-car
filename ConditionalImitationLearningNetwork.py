@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 
@@ -101,9 +102,9 @@ class BranchBlock(nn.Module):
     def direction(self):
         return self.target_direction
         
-class ImitationLearningNetwork(nn.Module):
+class ImitationLearningNetwork_Training(nn.Module):
     def __init__(self):
-        super(ImitationLearningNetwork, self).__init__()
+        super(ImitationLearningNetwork_Training, self).__init__()
         self.vision_module = VisionModule()  # out : 512
         self.speed_module  = SpeedModule()   # out : 128
         self.concat_module = ConcatenationModule() # out : 512
@@ -118,3 +119,18 @@ class ImitationLearningNetwork(nn.Module):
         x = self.concat_module(img_embedding, speed_embedding)
         preds = torch.stack( [ branch(x) for branch in self.branches ] )
         return preds # shape ( commands,  batch_size, params ) == (4 , batch_size, 3) 
+
+
+
+def save_model(model, epoch, path=None, optimizer=None):
+    assert not isinstance(path, type(None))
+    model.eval()
+    torch.save(model.state_dict(), os.path.join(path, f"model_epoch_{epoch}.pth"))
+    if optimizer:
+        torch.save(optimizer.state_dict(), os.path.join(path, f"optimizer_epoch_{epoch}.pth"))
+    model.train()
+
+def load_model(model_path, optimizer_path=None):
+    pass
+
+        
