@@ -26,7 +26,7 @@ class CarlaDataset(Dataset):
         target_vec = np.zeros((4,3), dtype=np.float32 )
         target_vec[command, :] =  target
 
-        speed = np.array( self.speeds[index]/90, dtype=np.float32  )
+        speed = np.array( self.speeds[index]/90, dtype=np.float32  )  # reshape to (-1,1)
         mask_vec = np.zeros((4,3), dtype= np.float32)
         mask_vec[command, :] = np.ones((1,3), dtype=np.float32 )
 
@@ -69,7 +69,7 @@ def worker_seed_initializer(worker_id):
 def get_custom_dataset(target_dir="data\data.csv", for_training=True):
     return CarlaDataset(target_dir, for_training=for_training)
 
-def get_custom_dataloader(dataset=None, num_workers=1, batch_size=32, shuffle=True, worker_init_fn=worker_seed_initializer, pin_memory=pin_memory):
+def get_custom_dataloader(dataset=None, num_workers=1, batch_size=32, shuffle=True, worker_init_fn=worker_seed_initializer, pin_memory=False):
     if dataset is None:
         dataset = get_custom_dataset()
     else:

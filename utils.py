@@ -8,7 +8,6 @@ def get_batch_mask(commands):  # shape ( commands,  batch_size, params ) == (4 ,
         mask[ commands[i], i, :] = torch.ones(3)
     return mask
 
-
 def save_model(model, epoch, path=None, optimizer=None):
     model.eval()
     torch.save(model.state_dict(), os.path.join(path, f"model_epoch_{epoch}.pth"))
@@ -25,3 +24,9 @@ def load_model(model, model_path, optimizer_path=None):
         optim = torch.load(optimizer_path)
         return model, optim
     return model
+
+def jit_compile_model(model):
+    #model = model.eval()
+    with torch.jit.optimized_execution(True):
+        jitted_model = torch.jit.script(model)
+    return jitted_model#jitted_model.train()
