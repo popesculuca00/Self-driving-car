@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 
 class CarlaDataset(Dataset):
     def __init__(self, target_dir, for_training=True):
-        #super(CarlaDataset, self).__init__()
-        csv = pd.read_csv(target_dir)[:40]
+        super(CarlaDataset, self).__init__()
+        csv = pd.read_csv(target_dir)[:600]
         self.speeds = csv["Speed"].values
         self.targets = csv[["Steer", "Gas", "Brake"]].values
         self.imgs = csv["Target path"].values
@@ -34,7 +34,7 @@ class CarlaDataset(Dataset):
         mask_vec = np.zeros((4,3), dtype= np.float32)
         mask_vec[command, :] = np.ones((1,3), dtype=np.float32 )
 
-        return img, speed, target_vec, mask_vec, img_orig#.reshape(-1),
+        return img, speed, target_vec, mask_vec#.reshape(-1),
 
     
     def __len__(self):
@@ -66,7 +66,7 @@ def get_transforms(for_training=True):
 if __name__ == "__main__":
     ds = CarlaDataset("data\data.csv", for_training=True)
     dl = DataLoader(dataset =ds, num_workers=0, batch_size=2)
-    for index, (img, speed, target_vec, mask_vec, img_orig) in enumerate(dl):
+    for index, (img, speed, target_vec, mask_vec) in enumerate(dl):
         pass
     print(img.shape)
     img = img[1].permute(  1, 2, 0)

@@ -7,13 +7,18 @@ def get_batch_mask(commands):  # shape ( commands,  batch_size, params ) == (4 ,
         mask[ commands[i], i, :] = torch.ones(3)
     return mask
 
-class AdditiveGaussianNoise(object):
-    def __init__(self, mean=0., std=1.):
-        self.std = std
-        self.mean = mean
-        
-    def __call__(self, tensor):
-        return tensor + torch.randn(tensor.size()) * self.std + self.mean
-    
-    def __repr__(self):
-        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
+
+def save_model(model, epoch, path=None, optimizer=None):
+    assert not isinstance(path, type(None))
+    model.eval()
+    torch.save(model.state_dict(), os.path.join(path, f"model_epoch_{epoch}.pth"))
+    if optimizer:
+        torch.save(optimizer.state_dict(), os.path.join(path, f"optimizer_epoch_{epoch}.pth"))
+    model.train()
+
+def load_model(model_path, optimizer_path=None):
+    model = torch.load(model_path)
+    if optimizer_path:
+        optim = torch.load(optimizer_path)
+        return model, optim
+    return moedl
