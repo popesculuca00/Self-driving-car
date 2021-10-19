@@ -1,16 +1,12 @@
 from imgaug.augmenters.arithmetic import AdditiveGaussianNoise
+from imgaug.augmenters.contrast import GammaContrast
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
-import glob
+import imgaug
 from imgaug import augmenters as iaa
-from torchvision.transforms import ColorJitter
-import h5py
 import numpy as np
-from torchvision.io import read_image
 import pandas as pd
-import torch
 from PIL import Image
-import matplotlib.pyplot as plt
 
 class CarlaDataset(Dataset):
     def __init__(self, target_dir, for_training=True):
@@ -34,19 +30,22 @@ class CarlaDataset(Dataset):
         mask_vec = np.zeros((4,3), dtype= np.float32)
         mask_vec[command, :] = np.ones((1,3), dtype=np.float32 )
 
-        return img, speed, target_vec, mask_vec#.reshape(-1),
+        return img, speed, target_vec, mask_vec
 
     
     def __len__(self):
         return len(self.imgs)
 
 def get_transforms(for_training=True):
-    
+    """
+    Get Compose object for image augmentation
+    """
     if for_training:
         trsfs = transforms.Compose([
                 iaa.Sequential([
-                        iaa.Sometimes(0.15, [iaa.GaussianBlur((0.0, 0.75))] ),
-                        iaa.Sometimes(0.2, [iaa.AdditiveGaussianNoise(scale=(0.0, 0.02))]),
+                        iaa.Sometimes(0.7, [iaa.GammaContrast((0.8, 1.15))] ),
+                        iaa.Sometimes(0.2, [iaa.GaussianBlur((0.0, 0.75))] ),
+                        iaa.Sometimes(0.6, [iaa.AdditiveGaussianNoise(scale=(0.0, 0.02))]),
                         iaa.Sometimes( 0.4,[
                             iaa.OneOf([
                                 iaa.Dropout( (0.0, 0.05), per_channel=0.01) ,
@@ -55,19 +54,24 @@ def get_transforms(for_training=True):
                 transforms.ToTensor()
 
         ])
-           
-                #
     else:
         trsfs = transforms.Compose([
                     transforms.ToTensor()
         ])
     return trsfs
 
-if __name__ == "__main__":
-    ds = CarlaDataset("data\data.csv", for_training=True)
-    dl = DataLoader(dataset =ds, num_workers=0, batch_size=2)
-    for index, (img, speed, target_vec, mask_vec) in enumerate(dl):
-        pass
-    print(img.shape)
-    img = img[1].permute(  1, 2, 0)
-    plt.imshow(img.numpy()/255)
+def worker_seed_initializer(worker_id):
+    """
+    Randomizes augmentation seed for each individual worker
+    """
+    imgaug.seed(np.random.get_state()[1][0] + worker_id )
+
+def get_custom_dataset(target_dir="data\data.csv", for_training=True):
+    return CarlaDataset(target_dir, for_training=for_training)
+
+def get_custom_dataloader(dataset=None, num_workers=1, batch_size=32, shuffle=True, worker_init_fn=worker_seed_initializer):
+    if dataset is None:
+        dataset = get_custom_dataset()
+    else:
+        assert isinstance(dataset, type(Dataset)), "Dataset argument must be of Dataset type"
+    return DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, worker_init_fn=worker_init_fn, shuffle=True)

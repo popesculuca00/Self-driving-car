@@ -1,5 +1,6 @@
+import os
 import torch
-from imgaug import augmenters as iaa
+
 
 def get_batch_mask(commands):  # shape ( commands,  batch_size, params ) == (4 , batch_size, 3) 
     mask = torch.zeros(4, len(commands), 3)
@@ -21,4 +22,4 @@ def load_model(model_path, optimizer_path=None):
     if optimizer_path:
         optim = torch.load(optimizer_path)
         return model, optim
-    return moedl
+    return model
