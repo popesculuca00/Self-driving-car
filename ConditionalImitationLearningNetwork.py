@@ -1,6 +1,7 @@
 import os
 import torch
 import torch.nn as nn
+import torch.jit as jit
 
 class ConvBlock(nn.Module):
     def __init__(self, input_filters, n_filters, kernel_size, stride=1):
@@ -89,7 +90,8 @@ class BranchBlock(nn.Module):
         self.relu = nn.ReLU()
         self.fc_2 = nn.Linear(256, 256)
         self.fc_3 = nn.Linear(256, 3)           ### steer, gas, brake
-        
+
+
     def forward(self, x):
 
         x = self.do( self.fc_1(x) )
@@ -113,14 +115,10 @@ class ImitationLearningNetwork_Training(nn.Module):
 
         self.branches = nn.ModuleList([BranchBlock(i) for i in self.branch_commands])
 
-
+    
     def forward(self, image_input, speed_input):
         img_embedding = self.vision_module(image_input)
         speed_embedding = self.speed_module(speed_input)
         x = self.concat_module(img_embedding, speed_embedding)
         preds = torch.stack( [ branch(x) for branch in self.branches ] )
         return preds # shape ( commands,  batch_size, params ) == (4 , batch_size, 3) 
-
-
-
-        
