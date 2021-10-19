@@ -5,7 +5,7 @@ import torch.nn as nn
 class ConvBlock(nn.Module):
     def __init__(self, input_filters, n_filters, kernel_size, stride=1):
         super(ConvBlock, self).__init__()
-        self.conv = nn.Conv2d(input_filters, n_filters, kernel_size=kernel_size, stride=stride)
+        self.conv = nn.Conv2d(input_filters, n_filters, kernel_size=kernel_size, stride=stride, bias=False)
         self.bn = nn.BatchNorm2d(n_filters)
     def forward(self, x):
         x = self.bn( self.conv(x) )
@@ -112,6 +112,7 @@ class ImitationLearningNetwork_Training(nn.Module):
         self.branch_commands = ["NoInput", "left", "right", "forward"]
 
         self.branches = nn.ModuleList([BranchBlock(i) for i in self.branch_commands])
+
 
     def forward(self, image_input, speed_input):
         img_embedding = self.vision_module(image_input)
