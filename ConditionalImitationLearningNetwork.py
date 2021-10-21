@@ -56,10 +56,10 @@ class SpeedModule(nn.Module):
     def __init__(self):
         super(SpeedModule, self).__init__()
         self.fc_1 = nn.Linear(1, 128)
-        self.do_1 = nn.Dropout(0.5)
+        self.do_1 = nn.Dropout(0.3)
         self.relu = nn.ReLU()
         self.fc_2 = nn.Linear(128, 128)
-        self.do_2 = nn.Dropout(0.5)
+        self.do_2 = nn.Dropout(0.3)
     
     def forward(self, x):
         x = self.relu ( self.do_1( self.fc_1(x) ) )

@@ -26,7 +26,7 @@ def load_model(model, model_path, optimizer_path=None):
     return model
 
 def jit_compile_model(model):
-    #model = model.eval()
     with torch.jit.optimized_execution(True):
         jitted_model = torch.jit.script(model)
-    return jitted_model#jitted_model.train()
+    return jitted_model
+
