@@ -18,7 +18,6 @@ class CarlaBaseDataset(Dataset):
         self.targets = csv[["Steer", "Gas", "Brake"]].values
         self.imgs = csv["Target path"].values
         self.commands = csv["High level command"].values
-        #self.trsfs = get_transforms(for_training)
 
     def __getitem__(self, index):
         img = np.asarray( Image.open(self.imgs[index]), dtype=np.float32)
@@ -46,7 +45,6 @@ class CarlaDataset(Dataset):
         (img, speed, target_vec, mask_vec) = self.dataset[index]
         img = self.img_transforms(img)
         return img, speed, target_vec, mask_vec
-
 
     def __len__(self):
         return len(self.dataset)
@@ -120,7 +118,7 @@ def get_dataloaders(base_path="data/data.csv", train_size = 0.95, num_workers=1,
         valid_ds = CarlaDataset(valid_subset, False)
 
         train_dl = dataset_to_dataloader(train_ds, num_workers, batch_size, shuffle, worker_seed_initializer, pin_memory)
-        valid_dl = dataset_to_dataloader(valid_ds, num_workers, batch_size, shuffle, worker_seed_initializer, pin_memory)
+        valid_dl = dataset_to_dataloader(valid_ds, num_workers, batch_size, False, worker_seed_initializer, pin_memory)
         return train_dl, valid_dl
 
     if train_size == 1:

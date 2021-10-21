@@ -1,0 +1,4 @@
+EPOCHS = 100
+EPOCH_SEPARATOR =  "\n" + "="*60 + "\n\n\n"
+BATCH_SIZE = 32
+TRAIN_TEST_SPLIT_SIZE = 0.95
