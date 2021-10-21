@@ -40,20 +40,19 @@ class CarlaDataset(Dataset):
     def __init__(self, dataset, train_flag=True):
         super(CarlaDataset, self).__init__()
         self.dataset = dataset
-        self.img_transforms = get_transforms(train_flag)
+        self.img_transforms = _get_transforms(train_flag)
         
     def __getitem__(self, index):
-        #self.img_transforms( self.dataset[index][] )
         (img, speed, target_vec, mask_vec) = self.dataset[index]
         img = self.img_transforms(img)
-        return index, img, speed, target_vec, mask_vec
+        return img, speed, target_vec, mask_vec
 
 
     def __len__(self):
         return len(self.dataset)
 
 
-def get_transforms(train_flag=True):
+def _get_transforms(train_flag=True):
     """
     Get Compose object for image augmentation
     """
@@ -77,19 +76,19 @@ def get_transforms(train_flag=True):
         ])
     return trsfs
 
-def worker_seed_initializer(worker_id):
+def _worker_seed_initializer(worker_id):
     """
     Randomizes augmentation seed for each individual worker
     """
     imgaug.seed(np.random.get_state()[1][0] + worker_id )
 
-def get_custom_dataset(target_dir="data\data.csv", for_training=True):
+def _base_dataset(target_dir="data\data.csv", for_training=True):
     """
     Returns carla base dataset
     """
     return CarlaBaseDataset(target_dir)
 
-def dataset_to_dataloader(dataset=None, num_workers=1, batch_size=32, shuffle=True, worker_init_fn=worker_seed_initializer, pin_memory="auto"):
+def dataset_to_dataloader(dataset=None, num_workers=1, batch_size=32, shuffle=True, worker_init_fn=_worker_seed_initializer, pin_memory="auto"):
     """
     Returns batch of img, speed, target_vec, mask_vec
     """
@@ -97,37 +96,32 @@ def dataset_to_dataloader(dataset=None, num_workers=1, batch_size=32, shuffle=Tr
         pin_memory = True if torch.cuda.is_available() else False
 
     if dataset is None:
-        dataset = get_custom_dataset()
+        dataset = _base_dataset()
     
     return DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, worker_init_fn=worker_init_fn, shuffle=True, pin_memory=pin_memory)
 
 
-def get_dataloaders(train_size = 0.95):
+def get_dataloaders(base_path="data/data.csv", train_size = 0.95, num_workers=1, batch_size=32, shuffle=True, worker_seed_initializer=_worker_seed_initializer, pin_memory="auto"):
 
-    base_dataset = CarlaBaseDataset("data/data.csv")
-    data_len = len(base_dataset)
-    valid_indexes = np.random.choice(data_len, int((1-train_size)*data_len) )
-    train_indexes = np.setdiff1d( np.arange(data_len), valid_indexes, assume_unique=True  )
-
-    train_subset = torch.utils.data.Subset(base_dataset, train_indexes)
-    valid_subset = torch.utils.data.Subset(base_dataset, valid_indexes)
-
-    train_ds = CarlaDataset(train_subset, True)
-    valid_ds = CarlaDataset(valid_subset, False)
-
-    train_dl = dataset_to_dataloader(train_ds, batch_size = 3)
-    valid_dl = dataset_to_dataloader(valid_ds, batch_size = 3)
-
-    return train_dl, valid_dl
+    assert (train_size <= 1.0 and train_size>0.0), "Training to validation ratio must be a float between 0 and 1"
     
+    base_dataset = CarlaBaseDataset(base_path)
 
+    if train_size < 1.0 :
+        
+        data_len = len(base_dataset)
+        valid_indexes = np.random.choice(data_len, int((1-train_size)*data_len) )
+        train_indexes = np.setdiff1d( np.arange(data_len), valid_indexes, assume_unique=True  )
 
-if __name__ == "__main__":
-    x = CarlaBaseDataset("data/data.csv")
-    ti, vi = get_dataloaders((x))
-    
-    x = torch.utils.data.Subset(x , vi)
-    x = CarlaDataset(x)
-    for (a, b, c, d) in x:
-        pass
-    print("done")
+        train_subset = torch.utils.data.Subset(base_dataset, train_indexes)
+        valid_subset = torch.utils.data.Subset(base_dataset, valid_indexes)
+
+        train_ds = CarlaDataset(train_subset, True)
+        valid_ds = CarlaDataset(valid_subset, False)
+
+        train_dl = dataset_to_dataloader(train_ds, num_workers, batch_size, shuffle, worker_seed_initializer, pin_memory)
+        valid_dl = dataset_to_dataloader(valid_ds, num_workers, batch_size, shuffle, worker_seed_initializer, pin_memory)
+        return train_dl, valid_dl
+
+    if train_size == 1:
+        return dataset_to_dataloader(base_dataset, num_workers, batch_size, shuffle, worker_seed_initializer, pin_memory)
