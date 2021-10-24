@@ -118,3 +118,15 @@ class ImitationLearningNetwork_Training(nn.Module):
         preds = torch.stack( [ branch(x) for branch in self.branches ] )
 
         return preds # shape ( commands,  batch_size, params ) == (4 , batch_size, 3) 
+
+
+def get_learning_rate_scheduler(optimizer):
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer=optimizer,
+        mode = "min",
+        factor = 0.5,
+        patience=10,
+        cooldown=5,
+        verbose=False
+    )
+    return scheduler

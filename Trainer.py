@@ -33,11 +33,13 @@ if __name__ == "__main__":
         progress_bar.write(f"STARTING EPOCH {epoch+1}/{EPOCHS}")
 
 
-        for index, (img, speed, target, mask) in enumerate(train_dataloader):
+        for index, (img, speed, target_vector, mask_vector) in enumerate(train_dataloader):
             predictions = model(img, speed)
-            predictions = predictions * mask
+            predictions = predictions * mask_vector
 
-            loss = criterion(predictions)
+            loss = criterion(predictions, target_vector)
+
+            
 
 
         
