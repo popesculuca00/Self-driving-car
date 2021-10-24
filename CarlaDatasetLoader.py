@@ -10,6 +10,7 @@ from albumentations.augmentations.transforms import RandomRain, RandomFog, Rando
 from albumentations import Compose, OneOf, Sequential # aug helper functions
 from albumentations.pytorch import ToTensorV2 
 
+
 class CarlaBaseDataset(Dataset):
     def __init__(self, target_dir):
         super(CarlaBaseDataset, self).__init__()
