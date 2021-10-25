@@ -21,7 +21,7 @@ class CarlaBaseDataset(Dataset):
         self.commands = csv["High level command"].values
 
     def __getitem__(self, index):
-        img = np.asarray( Image.open(self.imgs[index]), dtype=np.uint8) #convert to uint8 for gaussian noise
+        img = np.array( Image.open(self.imgs[index]), dtype=np.uint8, copy=True) #convert to uint8 for gaussian noise
         target = self.targets[index]
         command = int(self.commands[index]-2)
         target_vec = np.zeros((4,3), dtype=np.float32 )
@@ -46,6 +46,10 @@ class CarlaDataset(Dataset):
 
         #print( img.shape )
         img = self.img_transforms(image=img)["image"]
+
+        speed = np.reshape(speed, (1))
+        img = img / 255
+
         return img, np.reshape(speed, (1)), target_vec, mask_vec
 
     def __len__(self):

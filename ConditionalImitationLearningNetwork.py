@@ -115,7 +115,7 @@ class ImitationLearningNetwork_Training(nn.Module):
         img_embedding = self.vision_module(image_input)
         speed_embedding = self.speed_module(speed_input)
         x = self.concat_module(img_embedding, speed_embedding)
-        preds = torch.stack( [ branch(x) for branch in self.branches ] )
+        preds = torch.stack( [ branch(x) for branch in self.branches ], dim=1 )
 
         return preds # shape ( commands,  batch_size, params ) == (4 , batch_size, 3) 
 

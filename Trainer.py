@@ -58,19 +58,20 @@ if __name__ == "__main__":
                 cnt_valid_loss += loss.item() / predictions.shape[0]
 
 
-        train_loss_hist.append( cnt_train_loss )
-        valid_loss_hist.append( cnt_valid_loss )
+        train_loss_hist.append( cnt_train_loss/len(train_dataloader) )
+        valid_loss_hist.append( cnt_valid_loss/len(valid_dataloader) )
         
 
         progress_bar.write(f"Train loss: {cnt_train_loss}\nValidation loss:{cnt_valid_loss}")
 
-        if not (epoch % 5):
+        if not ( epoch % 5):
             progress_bar.write(f"Saving model for epoch {epoch+1}")
             # add saver
 
-        if cnt_train_loss > max(valid_loss_hist[:-1]):
-            progress_bar.write(f"Saving best model by validation")
-            # add saver 
+        if epoch > 5:
+            if cnt_train_loss > max(valid_loss_hist[:-1]):
+                progress_bar.write(f"Saving best model by validation")
+                # add saver 
 
         progress_bar.close()
         progress_bar.write(EPOCH_SEPARATOR)
