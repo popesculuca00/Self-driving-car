@@ -85,22 +85,36 @@ class BranchBlock(nn.Module):
         super(BranchBlock, self).__init__()
         self.target_direction = target_direction
         self.fc_1 = nn.Linear(512, 256)
-        self.do = nn.Dropout(0.5)
+        self.do = nn.Dropout(0.3)
         self.relu = nn.ReLU()
         self.fc_2 = nn.Linear(256, 256)
         self.fc_3 = nn.Linear(256, 3)           ### steer, gas, brake
 
-
     def forward(self, x):
         x = self.do( self.fc_1(x) )
-        x = self.relu( x )
+        x = self.relu(x)
         x = self.fc_2(x)
         x = self.fc_3(x)
         return x
-
     @property
     def direction(self):
         return self.target_direction
+
+class JointPreprocessingBlock(nn.Module):
+    def __init__(self):
+        super(JointPreprocessingBlock, self).__init__()
+        self.fc_1 = nn.Linear(512, 256)
+        self.do_1 = nn.Dropout(0.3)
+        self.relu = nn.ReLU()
+        self.fc_2 = nn.Linear(256, 256)
+        self.do_2 = nn.Dropout(0.3)
+        self.fc_3 = nn.Linear(256, 512)
+
+    def forward(self, x):
+        x = self.relu(self.do_1(self.fc_1(x)))
+        x = self.relu(self.do_2(self.fc_2(x)))
+        x = self.fc_3(x)
+        return x
         
 class ImitationLearningNetwork_Training(nn.Module):
     def __init__(self):
@@ -108,6 +122,7 @@ class ImitationLearningNetwork_Training(nn.Module):
         self.vision_module = VisionModule()  # out : 512
         self.speed_module  = SpeedModule()   # out : 128
         self.concat_module = ConcatenationModule() # out : 512
+        self.joint_preproc_module = JointPreprocessingBlock() # out : 512
         self.branch_commands = ["NoInput", "left", "right", "forward"]
         self.branches = nn.ModuleList([BranchBlock(i) for i in self.branch_commands])
     
@@ -115,6 +130,7 @@ class ImitationLearningNetwork_Training(nn.Module):
         img_embedding = self.vision_module(image_input)
         speed_embedding = self.speed_module(speed_input)
         x = self.concat_module(img_embedding, speed_embedding)
+        x = self.joint_preproc_module(x)
         preds = torch.stack( [ branch(x) for branch in self.branches ], dim=1) # preds.shape = (batch_size, 4, 3)
 
         return preds # shape ( commands,  batch_size, params ) == (4 , batch_size, 3) 
