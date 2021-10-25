@@ -46,7 +46,7 @@ class CarlaDataset(Dataset):
 
         #print( img.shape )
         img = self.img_transforms(image=img)["image"]
-        return img, speed, target_vec, mask_vec
+        return img, np.reshape(speed, (1)), target_vec, mask_vec
 
     def __len__(self):
         return len(self.dataset)
