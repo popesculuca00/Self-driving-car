@@ -15,12 +15,12 @@ class SelfDrivingAgent:
     """
     def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        left_path = "D:/SDC deployment/simulation/agent/models/weights/cil_left_optimized.pth"
-        front_path = "D:/SDC deployment/simulation/agent/models/weights/cil_front_optimized.pth"
-        right_path = "D:/SDC deployment/simulation/agent/models/weights/cil_right_optimized.pth"
+        left_path = "/simulation/agent/models/weights/cil_left_optimized.pth"
+        front_path = "/simulation/agent/models/weights/cil_front_optimized.pth"
+        right_path = "/simulation/agent/models/weights/cil_right_optimized.pth"
         self.object_detector = ObjectDetectorNetwork(object_thresh=0.4)
         self.auto_optimizer = JunctionDetector()
-        self.auto_optimizer.load_state_dict(torch.load("D:/SDC deployment/simulation/agent/models/weights/junction_detector.pth"))
+        self.auto_optimizer.load_state_dict(torch.load("/simulation/agent/models/weights/junction_detector.pth"))
         self.auto_optimizer = torch.jit.script(self.auto_optimizer.to(self.device).eval())
         self.left_branch = ConditionalBranchModel()
         self.left_branch.load_state_dict(torch.load(left_path))
