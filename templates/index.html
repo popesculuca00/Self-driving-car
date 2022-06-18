@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheets/style.css') }}" />
+  <title>Self driving car</title>
+</head>
+
+<body>
+
+  <div class="camera_browser">
+    <div class='tab tab_selected' id="agent">
+      camera 1
+    </div>
+
+    <div class='tab' id="spectator">
+      camera 2
+    </div>
+
+    <div class='tab' id="topdown">
+      camera 3
+    </div>
+
+  </div>
+
+
+
+  <div class="simdata">
+
+    <div class="left-panel">
+        <img id="stream" src="{{ url_for('video') }}"/>
+
+      <div class="window control-panel">
+
+        <div class="ai-controller">
+          <div id="left" class="arrow arrow-left"></div>
+          <div id="up" class="arrow arrow-up"></div>
+          <div id="right" class="arrow arrow-right"></div>
+
+          <div>
+            <div class="box center"></div>
+          </div>
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+    <div class="stats">
+      <div class="window performance">
+
+        <div class="title-monitor">
+          <h3>Resource monitor</h3>
+        </div>
+
+        <div id="fps-counter">
+          FPS: --
+        </div>
+
+        <div class="monitor">
+
+          <div class="monitor-container">
+
+
+            <div class="circle">
+              <div class="circle outer_circle">
+                <div class="middle-circle" id="cpu_meter"></div>
+                <div class="progress-spinner" id="ps_cpu"></div>
+              </div>
+            </div>
+
+
+            <div class="circle">
+              <div class="circle outer_circle">
+                <div class="middle-circle" id="ram_meter"></div>
+                <div class="progress-spinner" id="ps_ram"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="monitor-container">
+            <div class="circle">
+              <div class="circle outer_circle">
+                <div class="middle-circle" id="gpu_meter"></div>
+                <div class="progress-spinner" id="ps_gpu"></div>
+              </div>
+            </div>
+
+
+            <div class="circle">
+              <div class="circle outer_circle">
+                <div class="middle-circle" id="vram_meter"></div>
+                <div class="progress-spinner" id="ps_vram"></div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+
+
+      <div class="window simparams">
+
+        <div class="title-monitor">
+          <h3>Simulator controller</h3>
+        </div>
+
+        <div class="sim_inputs">
+          <div class="input-container ic1">
+            <input id="spawn-vehicles" class="input" type="number" placeholder=" " />
+            <div class="cut"></div>
+            <label for="spawn-vehicles" class="placeholder">Spawn vehicles</label>
+          </div>
+        </div>
+
+        <div class="sim_inputs">
+          <div class="input-container ic1">
+            <input id="spawn-walkers" class="input" type="number" placeholder=" " />
+            <div class="cut"></div>
+            <label for="spawn-walkers" class="placeholder">Spawn walkers</label>
+          </div>
+        </div>
+
+
+        <div class="dropups">
+          <div class="dropup town-selector">
+            <button class="dropbtn">Town</button>
+            <div class="dropup-content town-item-container">
+              <div class="menu-item town-item" id="Town01">Town 1</div>
+              <div class="menu-item town-item" id="Town02">Town 2</div>
+              <div class="menu-item town-item" id="Town03">Town 3</div>
+              <div class="menu-item town-item" id="Town04">Town 4</div>
+              <div class="menu-item town-item" id="Town05">Town 5</div>
+              <div class="menu-item town-item" id="Town10HD">Town 6</div>
+
+            </div>
+          </div>
+
+          <div class="dropup">
+            <button class="dropbtn weather-selector">Weather</button>
+            <div class="dropup-content weather-item-container">
+              <div class="menu-item weather-preset" id="ClearNoon">Clear Noon</div>
+              <div class="menu-item weather-preset" id="CloudyNoon">Cloudy Noon</div>
+              <div class="menu-item weather-preset" id="WetNoon">Wet Noon</div>
+              <div class="menu-item weather-preset" id="WetCloudyNoon">Wet Cloudy Noon</div>
+              <div class="menu-item weather-preset" id="MidRainyNoon">Mid Rainy Noon</div>
+              <div class="menu-item weather-preset" id="HardRainNoon">Hard Rain Noon</div>
+              <div class="menu-item weather-preset" id="SoftRainNoon">Soft Rain Noon</div>
+              <div class="menu-item weather-preset" id="ClearSunset">Clear Sunset</div>
+              <div class="menu-item weather-preset" id="CloudySunset">Cloudy Sunset</div>
+              <div class="menu-item weather-preset" id="WetSunset">Wet Sunset</div>
+              <div class="menu-item weather-preset" id="WetCloudySunset">Wet Cloudy Sunset</div>
+              <div class="menu-item weather-preset" id="MidRainSunset">Mid Rain Sunset</div>
+              <div class="menu-item weather-preset" id="HardRainSunset">Hard Rain Sunset</div>
+              <div class="menu-item weather-preset" id="SoftRainSunset">Soft Rain Sunset</div>
+            </div>
+          </div>
+
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div class="slider-container">
+        <div class="toggle-autopilot">Autopilot</div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-autopilot" checked>
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+
+    </div>
+
+
+
+
+  </div>
+
+
+
+  <script src="{{url_for('static', filename='buttons.js')}}"></script>
+
+</body>
+
+</html>
