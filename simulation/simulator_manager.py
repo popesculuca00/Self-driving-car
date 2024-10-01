@@ -11,7 +11,7 @@ from simulation.player_manager import Player
 
 
 class SimulatorManager:
-    def __init__(self, town="Town01", path="D:/Carla/CARLA_0.9.13", graphics="Epic", open_sim="auto_detect"):
+    def __init__(self, town="Town01", path="CARLA_0.9.13/WindowsNoEditor", graphics="Epic", open_sim="auto_detect"):
 
         if open_sim == "auto_detect":
             self.carla_process = None

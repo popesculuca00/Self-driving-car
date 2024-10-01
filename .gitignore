@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 
 /data/
+
+CARLA_0.9.13

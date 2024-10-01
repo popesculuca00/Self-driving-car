@@ -12,7 +12,7 @@ class ObjectDetectorNetwork():
         self.iou_thresh = iou_thresh
         self.object_thresh = object_thresh
         self.model = Yolov1(in_channels=3, split_size=7, num_boxes=2, num_classes=8).to(self.device)
-        self.model.load_state_dict(torch.load("/simulation/agent/models/weights/yolo")["state_dict"])
+        self.model.load_state_dict(torch.load("simulation/agent/models/weights/yolo.pth")["state_dict"])
         self.model = torch.jit.script(self.model.eval())
         self.transform = T.Compose([
             T.Resize((img_size, img_size))
