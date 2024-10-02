@@ -4,6 +4,7 @@ from gc import collect
 import psutil
 import carla
 import subprocess
+import platform
 from simulation.constants import *
 from simulation.npc_manager import NPCManager
 from simulation.player_manager import Player
@@ -13,18 +14,19 @@ from simulation.player_manager import Player
 class SimulatorManager:
     def __init__(self, town="Town01", path="CARLA_0.9.13/WindowsNoEditor", graphics="Epic", open_sim="auto_detect"):
 
-        if open_sim == "auto_detect":
-            self.carla_process = None
-            self.find_pid()
-            open_sim = True if self.carla_process is None else False
-        if open_sim is True:
-            print("Opening simulator.. ", file=FILE)
-            self.open_simulator(path, graphics)
-            sleep(5)
-            self.find_pid()
-        else:
-            print("Found open simulator", file=FILE)
-        self.client = carla.Client("localhost", 2000)
+        if platform.system().lower() != "linux":
+            if open_sim == "auto_detect":
+                self.carla_process = None
+                self.find_pid()
+                open_sim = True if self.carla_process is None else False
+            if open_sim is True:
+                print("Opening simulator.. ", file=FILE)
+                self.open_simulator(path, graphics)
+                sleep(5)
+                self.find_pid()
+            else:
+                print("Found open simulator", file=FILE)
+        self.client = carla.Client("host.docker.internal", 2000)
         self.client.set_timeout(15.0)
         print("Successfully connected to carla", file=FILE)
         self.change_map(town)

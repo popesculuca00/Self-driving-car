@@ -4,5 +4,6 @@ numba==0.55.1
 numpy==1.21.4
 opencv_python_headless==4.5.4.60
 psutil==5.9.0
-torch==1.10.0+cu113
-torchvision==0.11.1+cu113
+Werkzeug==2.2.2
+# torch==2.3.1
+# torchvision==0.18.1
